@@ -1,0 +1,23 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan*
+*.tfplan
+crash.log
+*.tfvars
+!terraform.tfvars.example
+
+# Local run artifacts (contain account IDs / real IPs)
+.local-artifacts/
+plan*.txt
+apply*.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# Secrets - never commit
+.env
+*.pem
+awsenv.sh

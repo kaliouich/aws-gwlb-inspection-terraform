@@ -1,0 +1,126 @@
+
+================================================================
+PRE-FLIGHT
+Client (attacker/legit user) public IP : 88.96.xx.xx
+Protected app (EIP)                    : 34.206.xx.xx
+GWLB target health:
+i-0f29caf1eea13c646	healthy
+i-0fb962cd8f465d3da	healthy
+
+================================================================
+CASE 1 - LEGITIMATE TRAFFIC (expect HTTP 200, inspected + allowed)
+curl /                     -> OK - hello from the protected application (ip-10-0-1-66.ec2.internal)
+ [HTTP 200]
+curl /products?id=42       -> OK - hello from the protected application (ip-10-0-1-66.ec2.internal)
+ [HTTP 200]
+curl /about                -> OK - hello from the protected application (ip-10-0-1-66.ec2.internal)
+ [HTTP 200]
+curl POST /api (json)      -> OK - hello from the protected application (ip-10-0-1-66.ec2.internal)
+ [HTTP 200]
+
+================================================================
+CASE 1 EVIDENCE - appliances: HTTP requests inspected & ALLOWED (eve.json)
+--- i-0f29caf1eea13c646
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 55180, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:42:15Z", "appliance": "ip-10-1-0-59.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 36640, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:42:29Z", "appliance": "ip-10-1-0-59.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 33020, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:43:13Z", "appliance": "ip-10-1-0-59.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 39338, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:43:43Z", "appliance": "ip-10-1-0-59.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 53082, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:45:24Z", "appliance": "ip-10-1-0-59.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 53100, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET /about HTTP/1.1", "timestamp": "2026-11-09T10:45:24Z", "appliance": "ip-10-1-0-59.ec
+
+--- i-0fb962cd8f465d3da
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 50480, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:44:26Z", "appliance": "ip-10-1-0-25.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 48484, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:44:41Z", "appliance": "ip-10-1-0-25.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 54736, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:44:56Z", "appliance": "ip-10-1-0-25.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 60848, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET / HTTP/1.1", "timestamp": "2026-11-09T10:45:10Z", "appliance": "ip-10-1-0-25.ec2.int
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 53088, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "GET /products?id=42 HTTP/1.1", "timestamp": "2026-11-09T10:45:24Z", "appliance": "ip-10-
+{"event_type": "http", "action": "allowed", "src_ip": "88.96.xx.xx", "src_port": 53102, "dest_ip": "10.0.1.66", "dest_port": 80, "proto": "TCP", "vni": 0, "http_request": "POST /api HTTP/1.1", "timestamp": "2026-11-09T10:45:24Z", "appliance": "ip-10-1-0-25.ec2
+
+
+================================================================
+CASE 1 EVIDENCE - application received the requests with the real client IP (transparent inspection)
+--- i-07f08324c75c01efe
+{"ts": "2026-11-09T10:44:56Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:10Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "GET", "path": "/products?id=42", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "GET", "path": "/about", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "POST", "path": "/api", "user_agent": "curl/8.5.0"}
+
+
+================================================================
+CASE 2 - MALICIOUS TRAFFIC (expect timeout / no response: packet dropped by the appliance)
+SQLi  ' OR '1'='1                  -> BLOCKED (no response, curl rc=28, timeout after 6s)
+SQLi  UNION SELECT                 -> BLOCKED (no response, curl rc=28, timeout after 6s)
+Path traversal /etc/passwd         -> BLOCKED (no response, curl rc=28, timeout after 6s)
+XSS   <script>                     -> BLOCKED (no response, curl rc=28, timeout after 6s)
+Log4Shell ${jndi:ldap://}          -> BLOCKED (no response, curl rc=28, timeout after 6s)
+Scanner UA (sqlmap)                -> BLOCKED (no response, curl rc=28, timeout after 6s)
+Shellshock                         -> BLOCKED (no response, curl rc=28, timeout after 6s)
+Command injection ;cat             -> BLOCKED (no response, curl rc=28, timeout after 6s)
+
+================================================================
+CASE 2 CHECK - application still healthy for a legitimate NEW connection after the attacks
+curl /  -> OK - hello from the protected application (ip-10-0-1-66.ec2.internal)
+ [HTTP 200]
+
+================================================================
+CASE 2 EVIDENCE - appliances: ALERTS with action=blocked (eve.json)
+--- i-0f29caf1eea13c646
+2026-11-09T10:45:50Z BLOCKED sid=1000001 88.96.xx.xx -> 10.0.1.66:80 | SQL injection - UNION SELECT | GET /?id=1%20UNION%20SELECT%20username,password%20FROM%20users HTTP/1.
+2026-11-09T10:45:56Z BLOCKED sid=1000010 88.96.xx.xx -> 10.0.1.66:80 | Path traversal / sensitive file access | GET /../../../../etc/passwd HTTP/1.1
+2026-11-09T10:46:14Z BLOCKED sid=1000060 88.96.xx.xx -> 10.0.1.66:80 | Vulnerability scanner user-agent | GET / HTTP/1.1
+2026-11-09T10:46:20Z BLOCKED sid=1000010 88.96.xx.xx -> 10.0.1.66:80 | Path traversal / sensitive file access | GET / HTTP/1.1
+
+--- i-0fb962cd8f465d3da
+2026-11-09T10:45:44Z BLOCKED sid=1000002 88.96.xx.xx -> 10.0.1.66:80 | SQL injection - tautology (' OR '1'='1) | GET /?id=1'%20OR%20'1'='1 HTTP/1.1
+2026-11-09T10:46:02Z BLOCKED sid=1000020 88.96.xx.xx -> 10.0.1.66:80 | Cross-site scripting - <script> | GET /?q=<script>alert(1)</script> HTTP/1.1
+2026-11-09T10:46:08Z BLOCKED sid=1000030 88.96.xx.xx -> 10.0.1.66:80 | Log4Shell JNDI lookup | GET / HTTP/1.1
+2026-11-09T10:46:26Z BLOCKED sid=1000010 88.96.xx.xx -> 10.0.1.66:80 | Path traversal / sensitive file access | GET /?cmd=ls;cat%20/etc/passwd HTTP/1.1
+
+
+================================================================
+CASE 2 EVIDENCE - appliance counters (/stats)
+--- i-0f29caf1eea13c646
+{'packets': 316, 'forwarded': 282, 'dropped': 34, 'alerts': 4, 'http_requests_allowed': 8}
+
+--- i-0fb962cd8f465d3da
+{'packets': 492, 'forwarded': 458, 'dropped': 34, 'alerts': 4, 'http_requests_allowed': 15}
+
+
+================================================================
+CASE 2 EVIDENCE - application access log: NONE of the malicious requests arrived
+--- i-07f08324c75c01efe
+{"ts": "2026-11-09T10:36:16Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:36:16Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:36:17Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:39:27Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:39:28Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:39:28Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:41:16Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:41:31Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:41:45Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:42:00Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:42:15Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:42:29Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:42:44Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:42:58Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:43:13Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:43:28Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:43:43Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:43:57Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:44:12Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:44:15Z", "client": "43.134.xx.xx", "method": "GET", "path": "/", "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1"}
+{"ts": "2026-11-09T10:44:26Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:44:41Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:44:56Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:10Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "GET", "path": "/products?id=42", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "GET", "path": "/about", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:45:24Z", "client": "88.96.xx.xx", "method": "POST", "path": "/api", "user_agent": "curl/8.5.0"}
+{"ts": "2026-11-09T10:46:32Z", "client": "88.96.xx.xx", "method": "GET", "path": "/", "user_agent": "curl/8.5.0"}
+
+lines matching attack patterns:
+0
+

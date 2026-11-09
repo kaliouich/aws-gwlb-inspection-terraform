@@ -1,0 +1,20 @@
+stages:
+  - validate
+  - test
+
+terraform:validate:
+  stage: validate
+  image:
+    name: hashicorp/terraform:1.9
+    entrypoint: [""]
+  script:
+    - terraform fmt -check -recursive
+    - terraform init -backend=false -input=false
+    - terraform validate
+
+ips:test:
+  stage: test
+  image: python:3.12-slim
+  # The appliance returns packets on a raw socket -> needs root + CAP_NET_RAW (default in Docker).
+  script:
+    - python tests/test_ips.py

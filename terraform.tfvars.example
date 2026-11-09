@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars (git-ignored) and adjust.
+
+region  = "us-east-1"
+project = "gwlb-demo"
+
+# Restrict who can reach the demo application (default: the whole Internet)
+# app_allowed_cidrs = ["203.0.113.10/32"]
+
+# Number of security appliances behind the GWLB
+# appliance_count = 2
+
+# instance_type = "t3.micro"
