@@ -184,7 +184,7 @@ Sorties : `app_public_ip`, `app_url`, `app_instance_id`, `appliance_instance_ids
 ├── scripts/demo.sh                        # démonstration des 2 cas + preuves
 ├── tests/test_ips.py                      # test local de l'appliance (sans AWS)
 ├── docs/                                  # architecture, rapport de démo, dépannage, images
-└── .gitlab-ci.yml                         # fmt + validate + test de l'appliance
+└── .github/workflows/ci.yml               # fmt + validate + test de l'appliance
 ```
 
 ## Limites et passage en production
