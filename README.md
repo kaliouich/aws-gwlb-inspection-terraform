@@ -7,7 +7,7 @@ appliances de sécurité l'inspectent via **GENEVE (UDP 6081)** avant de l'autor
 Le dépôt contient le Terraform, une appliance IPS légère (Python) et une démonstration scriptée avec deux cas
 d'acceptation : **trafic légitime autorisé** et **attaques détectées et bloquées**.
 
-![Architecture](docs/images/01_architecture.png)
+![Architecture](docs/images/01-architecture-diagram.png)
 
 ## Sommaire
 
